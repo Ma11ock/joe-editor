@@ -315,12 +315,10 @@ SCHEME *load_scheme(const char *name)
 	}
 	
 	/* Find file */
-	p = getenv("HOME");
-	if (p) {
-		joe_snprintf_2(buf, SIZEOF(buf), "%s/.joe/colors/%s.jcf", p, name);
-		f = jfopen(buf, "r");
-	}
-	
+    joe_snprintf_1(buf, sizeof(buf), "colors/%s.jcf", name);
+    b = get_joerc_file(buf);
+    
+    f = jfopen(b, "r");
 	if (!f) {
 		joe_snprintf_2(buf, SIZEOF(buf), "%scolors/%s.jcf", JOEDATA, name);
 		f = jfopen(buf, "r");
@@ -329,12 +327,15 @@ SCHEME *load_scheme(const char *name)
 		joe_snprintf_1(buf, SIZEOF(buf), "*%s.jcf", name);
 		f = jfopen(buf, "r");
 	}
+
+    joe_free(b);
 	
 	if (!f) {
 		return 0;
 	}
-	
+    
 	/* Create */
+    b = NULL;
 	colors = (SCHEME *) joe_malloc(SIZEOF(struct color_scheme));
 	colors->sets = NULL;
 	colors->name = zdup(name);

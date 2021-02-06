@@ -1,0 +1,8 @@
+#+TITLE:  Joe's Own Editor Patches
+#+AUTHOR: Ryan Jeffrey
+#+EMAIL: ryan@ryanmj.xyz
+
+* What
+Patches to [[https://joe-editor.sourceforge.io/][Joe's Own Editor 4.6]] that add:
+- relative line numbers
+- config file in ~$HOME/.config/joe~

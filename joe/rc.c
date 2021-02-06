@@ -242,7 +242,11 @@ int procrc(CAP *cap, char *name)
 							char *p = getenv("HOME");
 							int rtn = -1;
 							bf[0] = 0;
-							if (p && buf[x] != '/') {
+                            if (p && buf[x] != '/') {
+                                joe_snprintf_2(bf,SIZEOF(bf),"%s/.config/joe/%s",p,buf + x);
+                                rtn = procrc(cap, bf);
+                            }
+							if (rtn == -1 && buf[x] != '/') {
 								joe_snprintf_2(bf,SIZEOF(bf),"%s/.joe/%s",p,buf + x);
 								rtn = procrc(cap, bf);
 							}
@@ -366,4 +370,62 @@ int procrc(CAP *cap, char *name)
 	logmessage_1(joe_gettext(_("Finished processing %s\n")), name);
 
 	return err;		/* 0 for success, 1 for syntax error */
+}
+
+/* Check to see if a joe resource file exists. If it does, return its path.
+   If not, return NULL. */
+static char *try_get_joerc_file(const char *env_var, const char *rest_path, const char *file) {
+    char *var_path = getenv(env_var);
+    char *result;
+    const char *real_file = file ? file : "";
+    size_t result_len;
+    struct stat sb;
+    
+    if (!var_path || !rest_path)
+        return NULL;
+
+    result_len = zlen(var_path) + zlen(rest_path) + zlen(real_file) + 1;
+    result = (char*)joe_malloc(result_len);
+    joe_snprintf_3(result, result_len, "%s%s%s", var_path, rest_path, real_file);
+    if (stat(result, &sb)) {
+        joe_free(result);
+        return NULL;
+    }
+
+    return result;
+}
+
+/* Get the first available path to joe directory. First it will check 
+   $XDG_CONFIG_HOME/joe, then ~/.config/joe, and finally ~/.joe.
+   Returns NULL on failure. 
+   Returns a dynamically allocated string (path) on success.
+*/
+/* TODO add JOEDATA support. */
+char *get_joerc_file(const char *file) {
+    char *result = try_get_joerc_file("XDG_CONF_HOME", "/joe/", file);
+    if (!result)
+        result = try_get_joerc_file("HOME", "/.config/joe/", file);
+    if (!result)
+        result = try_get_joerc_file("HOME", ".joe/", file);
+
+    return result;
+}
+
+/* Try getting the actual joerc file. */
+char *get_joerc(const char *run) {
+    size_t runrc_len = zlen(run) + sizeof("rc") + 2; /* 2 for NUL and possible prefix dot. */
+    char *runrc = (char*)joe_malloc(runrc_len);
+
+    joe_snprintf_2(runrc, runrc_len, "%s%s", run, "rc");
+    
+    char *result = try_get_joerc_file("XDG_CONF_HOME", "/joe/", runrc);
+    if (!result)
+        result = try_get_joerc_file("HOME", "/.config/joe/", runrc);
+    if (!result) {
+        joe_snprintf_2(runrc, runrc_len, ".%s%s", run, "rc");
+        result = try_get_joerc_file("HOME", "/.joe/", runrc);
+    }
+
+    joe_free(runrc);
+    return result;
 }

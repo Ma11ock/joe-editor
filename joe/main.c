@@ -415,14 +415,10 @@ int main(int argc, char **real_argv, const char * const *envv)
 		}
 	}
 
-	/* User's joerc file */
-	s = getenv("HOME");
-	if (s) {
-		s = vsncpy(NULL, 0, sz(s));
-		s = vsncpy(sv(s), sc("/."));
-		s = vsncpy(sv(s), sv(run));
-		s = vsncpy(sv(s), sc("rc"));
+    /* Find the user's JOERC file. */
 
+	s = get_joerc(run);
+	if (s) {
 		if (!stat(s,&sbuf)) {
 			if (sbuf.st_mtime < time_rc) {
 				logmessage_2(joe_gettext(_("Warning: %s is newer than your %s.\n")),t,s);
@@ -438,6 +434,7 @@ int main(int argc, char **real_argv, const char * const *envv)
 			logerror_1(joe_gettext(_("There were errors in '%s'.  Falling back on default.\n")), s);
 		}
 	}
+
 
 	vsrm(s);
 	s = t;
