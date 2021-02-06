@@ -15,3 +15,12 @@ int procrc(CAP *cap, char *name);
 
 /* Validate rc file: return -1 if it's bad (call this after rc file has been loaded) */
 int validate_rc();
+
+/* Get a file in the JOERC directory. If file is NULL get the directory itself.
+   First checks $XDG_CONFIG_HOME/joe, then ~/.config/joe, and finally ~/.joe.
+   Returns NULL on failure. 
+   Returns a dynamically allocated string (path to the file) on success.
+*/
+char *get_joerc_file(const char *file);
+
+char *get_joerc(const char *run);
