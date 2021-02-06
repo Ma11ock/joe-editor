@@ -79,47 +79,17 @@ static void load_hist(FILE *f,B **bp)
 
 #define STATE_ID "# JOE state file v1.0\n"
 
-/* Load the .joe_state file, return NULL on failure. */
-static FILE *load_state_file(const char *env_prefix, const char *res_dir_path, int dot) {
-    char *cachedir = getenv(env_prefix);
-    struct stat sb;
-    FILE *result;
-    mode_t old_mask;
-    
-    if (!cachedir)
-        return NULL;
-
-    joe_snprintf_2(stdbuf,stdsiz,"%s%s",cachedir,res_dir_path);
-    
-    if(stat(stdbuf, &sb)) {
-        return NULL;
-    }
-
-    zlcat(stdbuf,stdsiz,dot ? ".joe_state" : "joe_state");
-    
-    old_mask = umask(0066);
-    result = fopen(stdbuf,"w");
-	umask(old_mask);
-    return result;
-}
-
 void save_state()
 {
 	FILE *f;
+    char *joe_state_path;
 	if (!joe_state)
 		return;
 
-    /* If the cache directory does not exist, try XDG_CONF_HOME, 
-       then ~/.cache/joe, then ~/.config/joe, and then finally ~/.joe_state. */
-    f = load_state_file("XDG_CACHE_HOME", "/joe/", 0);
+    f = get_cache_file("joe_state");
+
     if (!f)
-        f = load_state_file("HOME", "/.cache/joe/", 0);
-    if (!f)
-        f = load_state_file("HOME", "/.config/joe/", 0);
-    if (!f)
-        f = load_state_file("HOME", "/", 1);
-    if(!f)
-		return;
+        return;
 
 	/* Write ID */
 	fprintf(f,"%s",STATE_ID);

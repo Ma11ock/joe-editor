@@ -1379,25 +1379,14 @@ struct charmap *find_charmap(const char *name)
 		if (!map_name_cmp(m->name,name))
 			return m;
 
-    /* Check XDG_CONFIG_HOME. */
-	p = getenv("XDG_CONFIG_HOME");
-	f = 0;
+    /* Check for user charmap files. */
+    joe_snprintf_1(buf, SIZEOF(buf), "/charmaps/%s", name);
+    p = get_joerc_file(buf);
+	f = NULL;
 	if (p) {
-		joe_snprintf_2(buf,SIZEOF(buf),"%s/joe/charmaps/%s",p,name);
-		f = fopen(buf,"r");
-	}
-
-	/* Check ~/.config/joe and then ~/.joe/charmaps. */
-	p = getenv("HOME");
-	f = 0;
-	if (p) {
-        joe_snprintf_2(buf,SIZEOF(buf),"%s/.config/joe/charmaps/%s",p,name);
-		f = fopen(buf,"r");
-
-        if (!f) {
-            joe_snprintf_2(buf,SIZEOF(buf),"%s/.joe/charmaps/%s",p,name);
-            f = fopen(buf,"r");
-        }
+		f = fopen(p,"r");
+        joe_free(p);
+        p = NULL;
 	}
 
 	/* Check JOERCcharmaps */

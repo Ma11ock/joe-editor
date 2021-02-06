@@ -416,7 +416,6 @@ int main(int argc, char **real_argv, const char * const *envv)
 	}
 
     /* Find the user's JOERC file. */
-
 	s = get_joerc(run);
 	if (s) {
 		if (!stat(s,&sbuf)) {
@@ -428,6 +427,8 @@ int main(int argc, char **real_argv, const char * const *envv)
 		c = procrc(cap, s);
 		if (c == 0) {
 			vsrm(t);
+            joe_free(s);
+            s = NULL;
 			goto donerc;
 		}
 		if (c == 1) {
@@ -435,8 +436,7 @@ int main(int argc, char **real_argv, const char * const *envv)
 		}
 	}
 
-
-	vsrm(s);
+    joe_free(s);
 	s = t;
 	c = procrc(cap, s);
 	if (c == 0)

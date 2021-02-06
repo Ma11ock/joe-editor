@@ -23,4 +23,17 @@ int validate_rc();
 */
 char *get_joerc_file(const char *file);
 
+/* Get joe's main resource file. 
+   Run is argv[0].
+   Returns a dynmaically allocated path to the joerc.
+   Returns NULL on error.
+*/
 char *get_joerc(const char *run);
+
+/* Get cache file of name NAME. Starts by checking XDG_CACHE_HOME, if no 
+   dedicated cache dir is found, it will place the file into the joerc
+   directory. If there is no JOERC directory, it will place the file
+   as a dotfile in the user's home. 
+   Returns a valid FILE* on success, returns NULL on error.
+*/
+FILE *get_cache_file(const char *name);
