@@ -730,26 +730,17 @@ static struct high_state *load_dfa(struct high_syntax *syntax)
 	int line = 0;
 	int this_one = 0;
 	int inside_subr = 0;
+    char *syntax_path;
 
 	/* Load it */
+    joe_snprintf_1(name, SIZEOF(name), "syntax/%s.jsf", syntax->name);
+    syntax_path = get_joerc_file(name);
 
-    /* Check XDG_CONFIG_HOME and then check $HOME/.config/joe. */
-    p = getenv("XDG_CONFIG_HOME");
-	if (p) {
-		joe_snprintf_2(name,SIZEOF(name),"%s/joe/syntax/%s.jsf",p,syntax->name);
-		f = jfopen(name,"r");
-	}
-    
-	p = !f ? getenv("HOME") : NULL;
-	if (p) {
-		joe_snprintf_2(name,SIZEOF(name),"%s/.config/joe/syntax/%s.jsf",p,syntax->name);
-		f = jfopen(name,"r");
-
-        if (!f) {
-            joe_snprintf_2(name,SIZEOF(name),"%s/.joe/syntax/%s.jsf",p,syntax->name);
-            f = jfopen(name,"r");
-        }
-	}
+    if (syntax_path)
+    {
+        f = jfopen(syntax_path, "r");
+        joe_free(syntax_path);
+    }
 
 	if (!f) {
 		joe_snprintf_2(name,SIZEOF(name),"%ssyntax/%s.jsf",JOEDATA,syntax->name);
