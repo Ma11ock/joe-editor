@@ -1381,7 +1381,7 @@ struct charmap *find_charmap(const char *name)
 
     /* Check for user charmap files. */
     joe_snprintf_1(buf, SIZEOF(buf), "/charmaps/%s", name);
-    p = get_joerc_file(buf);
+    p = get_joerc_file_path(buf);
 	f = NULL;
 	if (p) {
 		f = fopen(p,"r");
