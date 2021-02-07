@@ -375,7 +375,7 @@ int procrc(CAP *cap, char *name)
 /* Check to see if a joe resource file exists. If it does, return its path.
    If not, return NULL. */
 static char *try_get_joerc_file(const char *env_var, const char *rest_path, const char *file) {
-    char *var_path = getenv(env_var);
+    char *var_path = env_var ? getenv(env_var) : "";
     char *result;
     const char *real_file = file ? file : "";
     size_t result_len;
@@ -387,6 +387,7 @@ static char *try_get_joerc_file(const char *env_var, const char *rest_path, cons
     result_len = zlen(var_path) + zlen(rest_path) + zlen(real_file) + 1;
     result = (char*)joe_malloc(result_len);
     joe_snprintf_3(result, result_len, "%s%s%s", var_path, rest_path, real_file);
+    
     if (stat(result, &sb)) {
         joe_free(result);
         return NULL;
@@ -406,6 +407,8 @@ char *get_joerc_file(const char *file) {
         result = try_get_joerc_file("HOME", "/.config/joe/", file);
     if (!result)
         result = try_get_joerc_file("HOME", "/.joe/", file);
+    if (!result)
+        result = try_get_joerc_file(NULL, JOEDATA, file);
 
     return result;
 }

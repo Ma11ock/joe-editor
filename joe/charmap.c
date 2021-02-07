@@ -1389,12 +1389,6 @@ struct charmap *find_charmap(const char *name)
         p = NULL;
 	}
 
-	/* Check JOERCcharmaps */
-	if (!f) {
-		joe_snprintf_2(buf,SIZEOF(buf),"%scharmaps/%s",JOEDATA,name);
-		f = fopen(buf,"r");
-	}
-
 	/* Parse and install character map from file */
 	if (f && (b = parse_charmap(name,f)))
 		return process_builtin(b);

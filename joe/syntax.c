@@ -743,10 +743,6 @@ static struct high_state *load_dfa(struct high_syntax *syntax)
     }
 
 	if (!f) {
-		joe_snprintf_2(name,SIZEOF(name),"%ssyntax/%s.jsf",JOEDATA,syntax->name);
-		f = jfopen(name,"r");
-	}
-	if (!f) {
 		joe_snprintf_1(name,SIZEOF(name),"*%s.jsf",syntax->name);
 		f = jfopen(name,"r");
 	}
