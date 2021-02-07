@@ -374,7 +374,7 @@ int procrc(CAP *cap, char *name)
 
 /* Check to see if a joe resource file exists. If it does, return its path.
    If not, return NULL. */
-static char *try_get_joerc_file(const char *env_var, const char *rest_path, const char *file) {
+static char *try_get_joerc_file_path(const char *env_var, const char *rest_path, const char *file) {
     char *var_path = env_var ? getenv(env_var) : "";
     char *result;
     const char *real_file = file ? file : "";
@@ -396,19 +396,20 @@ static char *try_get_joerc_file(const char *env_var, const char *rest_path, cons
     return result;
 }
 
-/* Get the first available path to joe directory. First it will check 
-   $XDG_CONFIG_HOME/joe, then ~/.config/joe, and finally ~/.joe.
+/* Get a file path in the JOERC directory. If file is NULL get the directory 
+   itself. First checks $XDG_CONFIG_HOME/joe, then ~/.config/joe, and 
+   finally ~/.joe. If no user JOERC dir exists, it check JOEDATA.
    Returns NULL on failure. 
-   Returns a dynamically allocated string (path) on success.
+   Returns a dynamically allocated string (path to the file) on success.
 */
-char *get_joerc_file(const char *file) {
-    char *result = try_get_joerc_file("XDG_CONF_HOME", "/joe/", file);
+char *get_joerc_file_path(const char *file) {
+    char *result = try_get_joerc_file_path("XDG_CONF_HOME", "/joe/", file);
     if (!result)
-        result = try_get_joerc_file("HOME", "/.config/joe/", file);
+        result = try_get_joerc_file_path("HOME", "/.config/joe/", file);
     if (!result)
-        result = try_get_joerc_file("HOME", "/.joe/", file);
+        result = try_get_joerc_file_path("HOME", "/.joe/", file);
     if (!result)
-        result = try_get_joerc_file(NULL, JOEDATA, file);
+        result = try_get_joerc_file_path(NULL, JOEDATA, file);
 
     return result;
 }
@@ -418,7 +419,7 @@ char *get_joerc_file(const char *file) {
    Returns a dynmaically allocated path to the joerc. 
    Returns NULL on error.
 */
-char *get_joerc(const char *run) {
+char *get_joerc_path(const char *run) {
     if (!run)
         return NULL;
     
@@ -427,12 +428,12 @@ char *get_joerc(const char *run) {
 
     joe_snprintf_2(runrc, runrc_len, "%s%s", run, "rc");
     
-    char *result = try_get_joerc_file("XDG_CONF_HOME", "/joe/", runrc);
+    char *result = try_get_joerc_file_path("XDG_CONF_HOME", "/joe/", runrc);
     if (!result)
-        result = try_get_joerc_file("HOME", "/.config/joe/", runrc);
+        result = try_get_joerc_file_path("HOME", "/.config/joe/", runrc);
     if (!result) {
         joe_snprintf_2(runrc, runrc_len, ".%s%s", run, "rc");
-        result = try_get_joerc_file("HOME", "/.joe/", runrc);
+        result = try_get_joerc_file_path("HOME", "/.joe/", runrc);
     }
 
     joe_free(runrc);

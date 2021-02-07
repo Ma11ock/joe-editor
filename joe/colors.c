@@ -316,7 +316,7 @@ SCHEME *load_scheme(const char *name)
 	
 	/* Find file */
     joe_snprintf_1(buf, sizeof(buf), "colors/%s.jcf", name);
-    b = get_joerc_file(buf);
+    b = get_joerc_file_path(buf);
 
     if (b)
         f = jfopen(b, "r");

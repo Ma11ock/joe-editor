@@ -734,7 +734,7 @@ static struct high_state *load_dfa(struct high_syntax *syntax)
 
 	/* Load it */
     joe_snprintf_1(name, SIZEOF(name), "syntax/%s.jsf", syntax->name);
-    syntax_path = get_joerc_file(name);
+    syntax_path = get_joerc_file_path(name);
 
     if (syntax_path)
     {

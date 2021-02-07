@@ -416,7 +416,7 @@ int main(int argc, char **real_argv, const char * const *envv)
 	}
 
     /* Find the user's JOERC file. */
-	s = get_joerc(run);
+	s = get_joerc_path(run);
 	if (s) {
 		if (!stat(s,&sbuf)) {
 			if (sbuf.st_mtime < time_rc) {
