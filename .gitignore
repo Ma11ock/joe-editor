@@ -74,19 +74,6 @@ cscope.in.out
 cscope.po.out
 
 
-
-autom4te.cache
-/autoscan.log
-/autoscan-*.log
-/compile
-/config.guess
-/config.log
-/config.status
-/config.sub
-/depcomp
-/missing
-/stamp-h1
-
 # http://www.gnu.org/software/texinfo
 
 /texinfo.tex
