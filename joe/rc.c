@@ -476,6 +476,8 @@ FILE *get_cache_file(const char *name) {
 
     FILE *result = load_cache_file("XDG_CACHE_HOME", "/joe/", name);
     if (!result)
+        result = load_cache_file("HOME", "/.cache/joe/", name);
+    if (!result)
         result = load_cache_file("XDG_CONF_HOME", "/joe/", name);
     if (!result)
         result = load_cache_file("HOME", "/.config/joe/", name);
