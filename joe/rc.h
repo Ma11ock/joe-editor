@@ -37,4 +37,4 @@ char *get_joerc_path(const char *run);
    as a dotfile in the user's home. 
    Returns a valid FILE* on success, returns NULL on error.
 */
-FILE *get_cache_file(const char *name);
+FILE *get_cache_file(const char *name, const char *mode);

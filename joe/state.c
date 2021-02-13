@@ -8,7 +8,7 @@
 
 #include "types.h"
 
-/* Set to enable use of ~/.joe_state file */
+/* Set to enable use of joe_state file */
 int joe_state;
 
 /* Save a history buffer */
@@ -86,7 +86,7 @@ void save_state()
 	if (!joe_state)
 		return;
 
-    f = get_cache_file("joe_state");
+    f = get_cache_file("joe_state", "w");
 
     if (!f)
         return;
@@ -115,19 +115,15 @@ void save_state()
 
 void load_state()
 {
-	char *home = getenv("HOME");
 	char buf[1024];
 	FILE *f;
 	if (!joe_state)
 		return;
-	if (!home)
-		return;
-	joe_snprintf_1(stdbuf,stdsiz,"%s/.joe_state",home);
-	f = fopen(stdbuf,"r");
+	f = get_cache_file("joe_state", "r");
 	if(!f)
 		return;
 
-	/* Only read state information if the version is correct */
+    /* Only read state information if the version is correct */
 	if (fgets(buf,sizeof(buf),f) && !zcmp(buf,STATE_ID)) {
 
 		/* Read state information */

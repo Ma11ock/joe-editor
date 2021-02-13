@@ -441,27 +441,32 @@ char *get_joerc_path(const char *run) {
 }
 
 /* Load a cache file. */
-static FILE *load_cache_file(const char *env_prefix, const char *res_dir_path, const char *file_name) {
+static FILE *load_cache_file(const char *env_prefix, const char *res_dir_path, const char *file_name, const char *mode) {
     char *cachedir = getenv(env_prefix);
     struct stat sb;
     FILE *result;
     mode_t old_mask;
     
-    if (!cachedir)
+    if (!cachedir || !mode)
         return NULL;
 
-    joe_snprintf_2(stdbuf,stdsiz,"%s%s",cachedir,res_dir_path);
+    joe_snprintf_2(stdbuf, stdsiz, "%s%s", cachedir, res_dir_path);
 
     
     if(stat(stdbuf, &sb)) {
         return NULL;
     }
 
-    zlcat(stdbuf,stdsiz,file_name);
-    
-    old_mask = umask(0066);
-    result = fopen(stdbuf,"w");
-	umask(old_mask);
+    zlcat(stdbuf, stdsiz, file_name);
+
+	if(mode[0] == 'w') {
+		old_mask = umask(0066);
+		result = fopen(stdbuf, "w");
+		umask(old_mask);
+	}
+	else {
+		result = fopen(stdbuf, "r");
+	}
     return result;
 }
 
@@ -471,25 +476,25 @@ static FILE *load_cache_file(const char *env_prefix, const char *res_dir_path, c
    as a dotfile in the user's home. 
    Returns a valid FILE* on success, returns NULL on error.
 */
-FILE *get_cache_file(const char *name) {
+FILE *get_cache_file(const char *name, const char *mode) {
     if (!name)
         return NULL;
 
     char *dotfile_name;
     size_t dotfile_len;
 
-    FILE *result = load_cache_file("XDG_CACHE_HOME", "/joe/", name);
+    FILE *result = load_cache_file("XDG_CACHE_HOME", "/joe/", name, mode);
     if (!result)
-        result = load_cache_file("HOME", "/.cache/joe/", name);
+        result = load_cache_file("HOME", "/.cache/joe/", name, mode);
     if (!result)
-        result = load_cache_file("XDG_CONF_HOME", "/joe/", name);
+        result = load_cache_file("XDG_CONF_HOME", "/joe/", name, mode);
     if (!result)
-        result = load_cache_file("HOME", "/.config/joe/", name);
+        result = load_cache_file("HOME", "/.config/joe/", name, mode);
     if (!result) {
         dotfile_len = zlen(name) + 2;
         dotfile_name = (char*)joe_malloc(dotfile_len);
         joe_snprintf_1(dotfile_name, dotfile_len, ".%s", name);
-        result = load_cache_file("HOME", "/", dotfile_name);
+        result = load_cache_file("HOME", "/", dotfile_name, mode);
         joe_free(dotfile_name);
     }
 
