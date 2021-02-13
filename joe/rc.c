@@ -443,30 +443,34 @@ char *get_joerc_path(const char *run) {
 /* Load a cache file. */
 static FILE *load_cache_file(const char *env_prefix, const char *res_dir_path, const char *file_name, const char *mode) {
     char *cachedir = getenv(env_prefix);
-    struct stat sb;
     FILE *result;
     mode_t old_mask;
+    size_t i;
+    size_t mode_len;
+    char *full_path = NULL;
+    size_t full_path_len;
     
     if (!cachedir || !mode)
         return NULL;
 
-    joe_snprintf_2(stdbuf, stdsiz, "%s%s", cachedir, res_dir_path);
+    full_path_len = zlen(cachedir) + zlen(res_dir_path) + zlen(file_name) + 1;
+    full_path = (char*)joe_malloc(full_path_len);
+    joe_snprintf_3(full_path, full_path_len, "%s%s%s", cachedir, res_dir_path, file_name);
 
-    
-    if(stat(stdbuf, &sb)) {
-        return NULL;
+    /* Determine fopen options, if we write we umask. */
+    mode_len = zlen(mode);
+    for(i = 0; i < mode_len; i++) {
+        if(mode[i] == 'w' || mode[i] == '+' || mode[i] == 'a') {
+            old_mask = umask(0066);
+            result = fopen(full_path, "w");
+            umask(old_mask);
+            joe_free(full_path);
+            return result;
+        }
     }
-
-    zlcat(stdbuf, stdsiz, file_name);
-
-	if(mode[0] == 'w') {
-		old_mask = umask(0066);
-		result = fopen(stdbuf, "w");
-		umask(old_mask);
-	}
-	else {
-		result = fopen(stdbuf, "r");
-	}
+    
+    result = fopen(full_path, "r");
+    joe_free(full_path);
     return result;
 }
 
