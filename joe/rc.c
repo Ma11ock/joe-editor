@@ -433,7 +433,7 @@ char *get_joerc_path(const char *run) {
         result = try_get_joerc_file_path("HOME", "/.config/joe/", runrc);
     if (!result) {
         joe_snprintf_2(runrc, runrc_len, ".%s%s", run, "rc");
-        result = try_get_joerc_file_path("HOME", "/.joe/", runrc);
+        result = try_get_joerc_file_path("HOME", "/", runrc);
     }
 
     joe_free(runrc);
